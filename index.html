@@ -8,31 +8,101 @@
 </head>
 <body>
 
-    <h1>Aplikasi Grafika Komputer</h1>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <div class="badge">2D</div>
+        <div>
+          <h1>Aplikasi Grafika Komputer</h1>
+          <p class="subtitle">Editor grafika 2D dengan objek, transformasi, dan animasi.</p>
+        </div>
+      </div>
+      <div class="status-bar">
+        <div class="status-item">
+          <span class="label">Mode</span>
+          <span id="modeLabel" class="value">Garis DDA</span>
+        </div>
+        <div class="status-item">
+          <span class="label">Objek</span>
+          <span id="objectCount" class="value">0</span>
+        </div>
+        <div class="status-item">
+          <span class="label">Animasi</span>
+          <span id="animationStatus" class="value">OFF</span>
+        </div>
+      </div>
+    </header>
 
-    <div class="toolbar">
+    <main class="content">
 
-        <button id="lineBtn">Garis DDA</button>
-        <button id="circleBtn">Lingkaran</button>
-        <button id="ellipseBtn">Elips</button>
+      <aside class="panel">
+        <section class="group">
+          <h2>Objek</h2>
+          <div class="button-grid">
+            <button id="lineBtn" class="btn is-active" aria-pressed="true">Garis DDA</button>
+            <button id="circleBtn" class="btn" aria-pressed="false">Lingkaran</button>
+            <button id="ellipseBtn" class="btn" aria-pressed="false">Elips</button>
+          </div>
+          <p class="group-note">Klik dua titik di kanvas untuk membuat objek.</p>
+        </section>
 
-        <button id="translateBtn">Translasi</button>
-        <button id="scaleBtn">Scaling</button>
-        <button id="rotateBtn">Rotasi</button>
-        <button id="animateBtn">Animasi</button>
-        <button id="undoBtn">Undo</button>
-        <button id="redoBtn">Redo</button>
-        <input type="color" id="colorPicker" value="#000000">
-        <button id="clearBtn">Clear</button>
+        <section class="group">
+          <h2>Transformasi</h2>
+          <div class="button-grid">
+            <button id="translateBtn" class="btn" aria-pressed="false">Translasi</button>
+            <button id="scaleBtn" class="btn" aria-pressed="false">Scaling</button>
+            <button id="rotateBtn" class="btn" aria-pressed="false">Rotasi</button>
+          </div>
+          <div class="hint-list">
+            <span>Translasi: drag / panah</span>
+            <span>Scaling: + / -</span>
+            <span>Rotasi: Q / E</span>
+          </div>
+        </section>
 
-    </div>
+        <section class="group">
+          <h2>Animasi & Riwayat</h2>
+          <div class="button-grid">
+            <button id="animateBtn" class="btn" aria-pressed="false">Animasi</button>
+            <button id="undoBtn" class="btn">Undo</button>
+            <button id="redoBtn" class="btn">Redo</button>
+          </div>
+        </section>
 
-    <canvas id="canvas" width="900" height="500"></canvas>
+        <section class="group">
+          <h2>Warna</h2>
+          <div class="color-row">
+            <input type="color" id="colorPicker" value="#000000" aria-label="Pilih warna">
+            <span class="color-label">Warna objek terpilih / baru</span>
+          </div>
+        </section>
 
+        <section class="group">
+          <h2>Kanvas</h2>
+          <div class="button-grid">
+            <button id="clearBtn" class="btn danger">Clear</button>
+          </div>
+        </section>
+      </aside>
 
-    <h3>Dibuat Oleh Kelompok 6</h3>
+      <section class="canvas-area">
+        <div class="canvas-card">
+          <canvas id="canvas" width="900" height="500"></canvas>
+        </div>
+        <div class="canvas-meta">
+          <div class="meta-chip">Klik objek untuk memilih</div>
+          <div class="meta-chip">Warna mengikuti objek terpilih</div>
+        </div>
+      </section>
+    </main>
 
-    <script src="script.js"></script>
+    <footer class="app-footer">
+      <span>Dibuat Oleh Kelompok 6</span>
+      <span class="footer-names">Marvel Valensiano, Elyuzar Fazlurrahman, Athallah Joyoningrat</span>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
 
 </body>
 </html>

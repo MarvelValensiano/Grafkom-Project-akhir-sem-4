@@ -1,10 +1,92 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+const modeLabel = document.getElementById("modeLabel");
+const objectCountLabel = document.getElementById("objectCount");
+const animationStatusLabel = document.getElementById("animationStatus");
+const animateBtn = document.getElementById("animateBtn");
+
+const modeButtons = {
+    line: document.getElementById("lineBtn"),
+    circle: document.getElementById("circleBtn"),
+    ellipse: document.getElementById("ellipseBtn"),
+    translate: document.getElementById("translateBtn"),
+    scale: document.getElementById("scaleBtn"),
+    rotate: document.getElementById("rotateBtn")
+};
+
+const modeLabels = {
+    line: "Garis DDA",
+    circle: "Lingkaran",
+    ellipse: "Elips",
+    translate: "Translasi",
+    scale: "Scaling",
+    rotate: "Rotasi"
+};
+
+const selectionColor = "#1f7a8c";
+
 let mode = "line";
 
 let startX, startY;
 let isDrawing = false;
+
+function updateStatus(){
+
+    if(modeLabel){
+        modeLabel.textContent = modeLabels[mode] || mode;
+    }
+
+    if(objectCountLabel){
+        objectCountLabel.textContent = objects.length;
+    }
+
+    if(animationStatusLabel){
+        animationStatusLabel.textContent = animationRunning ? "ON" : "OFF";
+    }
+}
+
+function setMode(nextMode){
+
+    mode = nextMode;
+
+    Object.keys(modeButtons).forEach((key) => {
+
+        const button = modeButtons[key];
+
+        if(!button) return;
+
+        const isActive = key === mode;
+
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+
+    updateStatus();
+}
+
+function updateAnimationButton(){
+
+    if(!animateBtn) return;
+
+    animateBtn.classList.toggle("is-active", animationRunning);
+    animateBtn.setAttribute("aria-pressed", animationRunning ? "true" : "false");
+
+    updateStatus();
+}
+
+function getCanvasPoint(event){
+
+    const rect = canvas.getBoundingClientRect();
+
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    return {
+        x: Math.floor((event.clientX - rect.left) * scaleX),
+        y: Math.floor((event.clientY - rect.top) * scaleY)
+    };
+}
 
 function saveState(){
 
@@ -26,6 +108,7 @@ function undo(){
     objects = undoStack.pop();
 
     redrawCanvas();
+    updateStatus();
 }
 
 function redo(){
@@ -39,6 +122,7 @@ function redo(){
     objects = redoStack.pop();
 
     redrawCanvas();
+    updateStatus();
 }
 
 /*
@@ -59,6 +143,9 @@ let redoStack = [];
 let animationRunning = false;
 let previewObject = null;
 
+setMode("line");
+updateAnimationButton();
+
 /*
 ========================
 BUTTON
@@ -66,15 +153,15 @@ BUTTON
 */
 
 document.getElementById("lineBtn").onclick = () => {
-    mode = "line";
+    setMode("line");
 };
 
 document.getElementById("circleBtn").onclick = () => {
-    mode = "circle";
+    setMode("circle");
 };
 
 document.getElementById("ellipseBtn").onclick = () => {
-    mode = "ellipse";
+    setMode("ellipse");
 };
 
 document.getElementById("clearBtn").onclick = () => {
@@ -82,18 +169,19 @@ document.getElementById("clearBtn").onclick = () => {
     objects = [];
 
     redrawCanvas();
+    updateStatus();
 };
 
 document.getElementById("translateBtn").onclick = () => {
-    mode = "translate";
+    setMode("translate");
 };
 
 document.getElementById("scaleBtn").onclick = () => {
-    mode = "scale";
+    setMode("scale");
 };
 
 document.getElementById("rotateBtn").onclick = () => {
-    mode = "rotate";
+    setMode("rotate");
 };
 
 document.getElementById("animateBtn").onclick = () => {
@@ -139,10 +227,7 @@ CANVAS CLICK
 
 canvas.addEventListener("click", function(e){
 
-    const rect = canvas.getBoundingClientRect();
-
-    const x = Math.floor(e.clientX - rect.left);
-    const y = Math.floor(e.clientY - rect.top);
+    const { x, y } = getCanvasPoint(e);
 
     if(
         mode === "translate" ||
@@ -210,6 +295,7 @@ canvas.addEventListener("click", function(e){
         }
 
         redrawCanvas();
+        updateStatus();
 
         previewObject = null;
 
@@ -222,10 +308,7 @@ canvas.addEventListener("mousemove", function(e){
 
     if(isDragging && selectedObject){
 
-        const rect = canvas.getBoundingClientRect();
-    
-        const x = Math.floor(e.clientX - rect.left);
-        const y = Math.floor(e.clientY - rect.top);
+        const { x, y } = getCanvasPoint(e);
     
         const dx = x - lastMouseX;
         const dy = y - lastMouseY;
@@ -242,10 +325,7 @@ canvas.addEventListener("mousemove", function(e){
 
     if(!isDrawing) return;
 
-    const rect = canvas.getBoundingClientRect();
-
-    const x = Math.floor(e.clientX - rect.left);
-    const y = Math.floor(e.clientY - rect.top);
+    const { x, y } = getCanvasPoint(e);
 
     if(mode === "line"){
 
@@ -289,10 +369,7 @@ canvas.addEventListener("mousedown", function(e){
 
     if(mode !== "translate") return;
 
-    const rect = canvas.getBoundingClientRect();
-
-    const x = Math.floor(e.clientX - rect.left);
-    const y = Math.floor(e.clientY - rect.top);
+    const { x, y } = getCanvasPoint(e);
 
     selectObject(x, y);
 
@@ -334,7 +411,7 @@ function redrawCanvas(){
 
         if(obj === selectedObject){
     
-            drawObject(obj, "deepskyblue");
+            drawObject(obj, selectionColor);
     
         }else{
     
@@ -593,6 +670,8 @@ function rotatePoint(x, y, cx, cy, radian){
 function toggleAnimation(){
 
     animationRunning = !animationRunning;
+
+    updateAnimationButton();
 
     if(animationRunning){
 
