@@ -40,10 +40,12 @@
           <h2>Objek</h2>
           <div class="button-grid">
             <button id="lineBtn" class="btn is-active" aria-pressed="true">Garis DDA</button>
+            <button id="bresenhamBtn" class="btn" aria-pressed="false">Garis Bresenham</button>
             <button id="circleBtn" class="btn" aria-pressed="false">Lingkaran</button>
             <button id="ellipseBtn" class="btn" aria-pressed="false">Elips</button>
+            <button id="brushBtn" class="btn" aria-pressed="false">Brush</button>
           </div>
-          <p class="group-note">Klik dua titik di kanvas untuk membuat objek.</p>
+          <p class="group-note">Klik untuk menggambar. Garis: klik banyak titik, double-klik selesai. Brush: drag bebas.</p>
         </section>
 
         <section class="group">
@@ -52,11 +54,13 @@
             <button id="translateBtn" class="btn" aria-pressed="false">Translasi</button>
             <button id="scaleBtn" class="btn" aria-pressed="false">Scaling</button>
             <button id="rotateBtn" class="btn" aria-pressed="false">Rotasi</button>
+            <button id="shearBtn" class="btn" aria-pressed="false">Shear</button>
           </div>
           <div class="hint-list">
             <span>Translasi: drag / panah</span>
-            <span>Scaling: + / -</span>
-            <span>Rotasi: Q / E</span>
+            <span>Scaling: scroll / + -</span>
+            <span>Rotasi: drag putar / Q E</span>
+            <span>Shear: drag geser / Z X</span>
           </div>
         </section>
 
@@ -70,19 +74,44 @@
         </section>
 
         <section class="group">
-          <h2>Warna</h2>
+          <h2>Kelola Objek</h2>
+          <div class="button-grid">
+            <button id="deleteBtn" class="btn danger">Hapus</button>
+            <button id="clearBtn" class="btn danger">Clear All</button>
+          </div>
+          <p class="group-note">Pilih objek lalu tekan Hapus / tombol Delete</p>
+        </section>
+
+        <section class="group">
+          <h2>Warna & Garis</h2>
           <div class="color-row">
             <input type="color" id="colorPicker" value="#000000" aria-label="Pilih warna">
-            <span class="color-label">Warna objek terpilih / baru</span>
+            <span class="color-label">Warna objek</span>
+          </div>
+          <div class="color-row">
+            <label class="range-label">Tebal garis</label>
+            <input type="range" id="lineWidthRange" min="1" max="10" value="1" class="line-width-range">
+            <span id="lineWidthValue" class="range-value">1</span>
           </div>
         </section>
 
         <section class="group">
-          <h2>Kanvas</h2>
+          <h2>Fill & Interseksi</h2>
           <div class="button-grid">
-            <button id="clearBtn" class="btn danger">Clear</button>
+            <button id="fillBtn" class="btn" aria-pressed="false">Fill</button>
+            <button id="intersectBtn" class="btn is-active" aria-pressed="true">Irisan</button>
+          </div>
+          <p class="group-note">Pilih objek lalu tekan Fill untuk isi warna. Jika tanpa seleksi, Fill sebagai default objek baru.</p>
+          <div class="color-row">
+            <input type="color" id="fillColorPicker" value="#cccccc" aria-label="Warna fill">
+            <span class="color-label">Warna fill</span>
+          </div>
+          <div class="color-row">
+            <input type="color" id="intersectColorPicker" value="#ff6666" aria-label="Warna irisan">
+            <span class="color-label">Warna irisan</span>
           </div>
         </section>
+
       </aside>
 
       <section class="canvas-area">
