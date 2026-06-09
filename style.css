@@ -30,13 +30,13 @@ body{
 
 h1{
     margin:0;
-    font-size:32px;
+    font-size:26px;
     letter-spacing:-0.5px;
 }
 
 h2{
-    margin:0 0 12px 0;
-    font-size:18px;
+    margin:0;
+    font-size:15px;
     text-transform:uppercase;
     letter-spacing:1px;
 }
@@ -48,7 +48,7 @@ p{
 .app{
     max-width:1200px;
     margin:0 auto;
-    padding:32px 24px 28px;
+    padding:20px 24px 16px;
 }
 
 .app-header{
@@ -56,7 +56,7 @@ p{
     align-items:flex-start;
     justify-content:space-between;
     gap:24px;
-    margin-bottom:28px;
+    margin-bottom:16px;
     flex-wrap:wrap;
 }
 
@@ -89,11 +89,11 @@ p{
 .status-item{
     background:var(--panel);
     border:1px solid var(--line);
-    border-radius:12px;
-    padding:8px 12px;
+    border-radius:10px;
+    padding:6px 10px;
     display:flex;
     align-items:center;
-    gap:10px;
+    gap:8px;
     box-shadow:var(--shadow);
 }
 
@@ -119,29 +119,31 @@ p{
     background:var(--panel);
     border:1px solid var(--line);
     border-radius:18px;
-    padding:20px;
+    padding:16px;
     box-shadow:var(--shadow);
     display:flex;
     flex-direction:column;
-    gap:20px;
+    gap:12px;
+    max-height:calc(100vh - 120px);
+    overflow-y:auto;
 }
 
 .group{
     display:flex;
     flex-direction:column;
-    gap:10px;
+    gap:6px;
 }
 
 .group-note{
-    font-size:13px;
+    font-size:11px;
     color:var(--muted);
 }
 
 .hint-list{
     display:flex;
     flex-direction:column;
-    gap:6px;
-    font-size:13px;
+    gap:3px;
+    font-size:12px;
     color:var(--muted);
 }
 
@@ -152,13 +154,13 @@ p{
 }
 
 .btn{
-    padding:10px 12px;
+    padding:8px 10px;
     border:1px solid var(--line);
     background:white;
     color:var(--ink);
     cursor:pointer;
-    border-radius:12px;
-    font-size:14px;
+    border-radius:10px;
+    font-size:13px;
     font-weight:600;
     font-family:inherit;
     transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
@@ -190,13 +192,13 @@ p{
 }
 
 .color-label{
-    font-size:13px;
+    font-size:12px;
     color:var(--muted);
 }
 
 input[type="color"]{
-    width:52px;
-    height:36px;
+    width:40px;
+    height:30px;
     border:none;
     background:transparent;
     cursor:pointer;
@@ -225,14 +227,14 @@ input[type="color"]{
 .canvas-area{
     display:flex;
     flex-direction:column;
-    gap:14px;
+    gap:10px;
 }
 
 .canvas-card{
     background:white;
     border:2px solid var(--line);
-    border-radius:18px;
-    padding:16px;
+    border-radius:14px;
+    padding:12px;
     box-shadow:var(--shadow);
 }
 
@@ -241,7 +243,7 @@ canvas{
     height:auto;
     background:white;
     border:1px solid rgba(0, 0, 0, 0.2);
-    border-radius:12px;
+    border-radius:10px;
 }
 
 .canvas-meta{
@@ -260,13 +262,13 @@ canvas{
 }
 
 .app-footer{
-    margin-top:28px;
+    margin-top:16px;
     display:flex;
     justify-content:space-between;
     flex-wrap:wrap;
     gap:8px;
     color:var(--muted);
-    font-size:13px;
+    font-size:12px;
 }
 
 .footer-names{

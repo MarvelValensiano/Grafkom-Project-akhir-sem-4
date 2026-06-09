@@ -11,6 +11,8 @@ const modeButtons = {
     bresenham: document.getElementById("bresenhamBtn"),
     circle: document.getElementById("circleBtn"),
     ellipse: document.getElementById("ellipseBtn"),
+    square: document.getElementById("squareBtn"),
+    triangle: document.getElementById("triangleBtn"),
     brush: document.getElementById("brushBtn"),
     translate: document.getElementById("translateBtn"),
     scale: document.getElementById("scaleBtn"),
@@ -23,6 +25,8 @@ const modeLabels = {
     bresenham: "Garis Bresenham",
     circle: "Lingkaran",
     ellipse: "Elips",
+    square: "Persegi",
+    triangle: "Segitiga",
     brush: "Brush",
     translate: "Translasi",
     scale: "Scaling",
@@ -152,6 +156,10 @@ let objects = [];
 let selectedObjects = [];
 let isDragging = false;
 
+function isPolygonLike(obj){
+    return obj.type === "polyline" || obj.type === "square" || obj.type === "triangle";
+}
+
 function isSelected(obj){
     return selectedObjects.includes(obj);
 }
@@ -232,6 +240,14 @@ document.getElementById("clearBtn").onclick = () => {
     updateStatus();
 };
 
+document.getElementById("squareBtn").onclick = () => {
+    setMode("square");
+};
+
+document.getElementById("triangleBtn").onclick = () => {
+    setMode("triangle");
+};
+
 document.getElementById("brushBtn").onclick = () => {
     setMode("brush");
 };
@@ -304,12 +320,12 @@ fillBtn.onclick = () => {
 
     let primary = getPrimary();
 
-    if(primary && (primary.type === "circle" || primary.type === "ellipse" || primary.type === "polyline")){
+    if(primary && (primary.type === "circle" || primary.type === "ellipse" || primary.type === "polyline" || primary.type === "square" || primary.type === "triangle")){
 
         saveState();
 
         for(let obj of selectedObjects){
-            if(obj.type === "circle" || obj.type === "ellipse" || obj.type === "polyline"){
+            if(obj.type === "circle" || obj.type === "ellipse" || obj.type === "polyline" || obj.type === "square" || obj.type === "triangle"){
                 if(obj.fillColor){
                     obj.fillColor = null;
                 }else{
@@ -391,7 +407,7 @@ function findSnapPoint(x, y){
 
     for(let obj of objects){
 
-        if(obj.type === "polyline"){
+        if(isPolygonLike(obj)){
 
             for(let p of obj.points){
 
@@ -557,6 +573,24 @@ canvas.addEventListener("mousemove", function(e){
             fillColor: fillOnDraw ? fillCurrentColor : null
         };
 
+    }else if(mode === "square"){
+
+        previewObject = {
+            type: "square",
+            points: createSquarePoints(startX, startY, x, y),
+            lineWidth: lineWidth,
+            fillColor: fillOnDraw ? fillCurrentColor : null
+        };
+
+    }else if(mode === "triangle"){
+
+        previewObject = {
+            type: "triangle",
+            points: createTrianglePoints(startX, startY, x, y),
+            lineWidth: lineWidth,
+            fillColor: fillOnDraw ? fillCurrentColor : null
+        };
+
     }else if(mode === "line" || mode === "bresenham"){
 
         if(buildPoints.length > 0){
@@ -595,7 +629,7 @@ canvas.addEventListener("click", function(e){
         return;
     }
 
-    if(mode === "circle" || mode === "ellipse"){
+    if(mode === "circle" || mode === "ellipse" || mode === "square" || mode === "triangle"){
 
         if(!isBuilding){
 
@@ -641,6 +675,34 @@ canvas.addEventListener("click", function(e){
                     vy: 2,
                     color: currentColor,
                     lineWidth: lineWidth,
+                    fillColor: fillOnDraw ? fillCurrentColor : null
+                });
+
+            }else if(mode === "square"){
+
+                let pts = createSquarePoints(startX, startY, x, y);
+
+                objects.push({
+                    type: "square",
+                    points: pts,
+                    color: currentColor,
+                    lineWidth: lineWidth,
+                    vx: 2,
+                    vy: 2,
+                    fillColor: fillOnDraw ? fillCurrentColor : null
+                });
+
+            }else if(mode === "triangle"){
+
+                let pts = createTrianglePoints(startX, startY, x, y);
+
+                objects.push({
+                    type: "triangle",
+                    points: pts,
+                    color: currentColor,
+                    lineWidth: lineWidth,
+                    vx: 2,
+                    vy: 2,
                     fillColor: fillOnDraw ? fillCurrentColor : null
                 });
             }
@@ -815,7 +877,7 @@ function drawSelectionBoxFor(selObj){
         minY = selObj.yc - selObj.ry - 6;
         maxY = selObj.yc + selObj.ry + 6;
 
-    }else if(selObj.type === "polyline"){
+    }else if(isPolygonLike(selObj)){
 
         let pts = selObj.points;
 
@@ -1077,7 +1139,7 @@ function isInside(obj, x, y){
             (rySin * rySin) / (obj.ry * obj.ry)
         ) <= 1;
 
-    }else if(obj.type === "polyline" && obj.fillColor){
+    }else if(isPolygonLike(obj) && obj.fillColor){
 
         let pts = obj.points;
 
@@ -1110,7 +1172,7 @@ function drawIntersections(){
 
     let filledObjects;
 
-    let isFillable = o => o.fillColor && (o.type === "circle" || o.type === "ellipse" || o.type === "polyline");
+    let isFillable = o => o.fillColor && (o.type === "circle" || o.type === "ellipse" || isPolygonLike(o));
 
     if(selectedObjects.length >= 2){
 
@@ -1130,7 +1192,7 @@ function drawIntersections(){
 
             function getBounds(o){
 
-                if(o.type === "polyline"){
+                if(isPolygonLike(o)){
 
                     let minX = Infinity, maxX = -Infinity;
                     let minY = Infinity, maxY = -Infinity;
@@ -1207,6 +1269,89 @@ function drawPolyline(obj, color){
     }
 }
 
+function drawClosedPolygon(obj, color){
+
+    let pts = obj.points;
+
+    if(!pts || pts.length < 3) return;
+
+    let sz = obj.lineWidth || 1;
+
+    for(let i = 0; i < pts.length; i++){
+
+        let p1 = pts[i];
+        let p2 = pts[(i + 1) % pts.length];
+
+        drawLineDDA(p1.x, p1.y, p2.x, p2.y, color, sz);
+    }
+}
+
+function getObjectCenter(obj){
+
+    if(obj.type === "square" || obj.type === "triangle"){
+
+        let pts = obj.points;
+        let cx = 0, cy = 0;
+
+        for(let p of pts){
+            cx += p.x;
+            cy += p.y;
+        }
+
+        return {x: cx / pts.length, y: cy / pts.length};
+    }
+
+    if(isPolygonLike(obj)){
+
+        let pts = obj.points;
+        let cx = 0, cy = 0;
+
+        for(let p of pts){
+            cx += p.x;
+            cy += p.y;
+        }
+
+        return {x: cx / pts.length, y: cy / pts.length};
+    }
+
+    return null;
+}
+
+function createSquarePoints(x1, y1, x2, y2){
+
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+
+    let side = Math.max(Math.abs(dx), Math.abs(dy));
+    let sx = dx >= 0 ? 1 : -1;
+    let sy = dy >= 0 ? 1 : -1;
+
+    let xEnd = x1 + (sx * side);
+    let yEnd = y1 + (sy * side);
+
+    return [
+        { x: x1, y: y1 },
+        { x: xEnd, y: y1 },
+        { x: xEnd, y: yEnd },
+        { x: x1, y: yEnd }
+    ];
+}
+
+function createTrianglePoints(x1, y1, x2, y2){
+
+    let minX = Math.min(x1, x2);
+    let maxX = Math.max(x1, x2);
+    let minY = Math.min(y1, y2);
+    let maxY = Math.max(y1, y2);
+    let midX = (minX + maxX) / 2;
+
+    return [
+        { x: midX, y: minY },
+        { x: maxX, y: maxY },
+        { x: minX, y: maxY }
+    ];
+}
+
 function drawObjectFill(obj){
 
     if(obj.type === "circle" && obj.fillColor){
@@ -1250,7 +1395,7 @@ function drawObjectFill(obj){
 
         if(obj.shearX) ctx.restore();
 
-    }else if(obj.type === "polyline" && obj.fillColor){
+    }else if(isPolygonLike(obj) && obj.fillColor){
 
         let pts = obj.points;
 
@@ -1338,7 +1483,11 @@ function drawObject(obj, color){
 
         if(obj.shearX) ctx.restore();
 
-    }else if(obj.type === "polyline"){
+    }else if(obj.type === "square" || obj.type === "triangle"){
+
+        drawClosedPolygon(obj, color);
+
+    }else if(isPolygonLike(obj)){
 
         drawPolyline(obj, color);
     }
@@ -1397,7 +1546,7 @@ function selectObject(x, y, toggle){
                 hit = obj;
             }
 
-        }else if(obj.type === "polyline"){
+        }else if(isPolygonLike(obj)){
 
             let pts = obj.points;
 
@@ -1461,7 +1610,7 @@ function translateObject(obj, tx, ty){
         obj.xc += tx;
         obj.yc += ty;
 
-    }else if(obj.type === "polyline"){
+    }else if(isPolygonLike(obj)){
 
         for(let p of obj.points){
             p.x += tx;
@@ -1502,7 +1651,7 @@ function scaleObject(obj, scaleFactor){
         obj.rx *= scaleFactor;
         obj.ry *= scaleFactor;
 
-    }else if(obj.type === "polyline"){
+    }else if(isPolygonLike(obj)){
 
         let pts = obj.points;
 
@@ -1596,7 +1745,7 @@ function rotateObject(obj, angle){
     ========================
     */
 
-    }else if(obj.type === "polyline"){
+    }else if(isPolygonLike(obj)){
 
         let pts = obj.points;
 
@@ -1749,7 +1898,7 @@ function checkCollision(obj){
     ========================
     */
 
-    }else if(obj.type === "polyline"){
+    }else if(isPolygonLike(obj)){
 
         let minX = Infinity, maxX = -Infinity;
         let minY = Infinity, maxY = -Infinity;
